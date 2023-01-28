@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MovieDataBase_Api.Db.Entities;
-using MovieDataBase_Api.Db.Mappings;
+//using MovieDataBase_Api.Db.Mappings;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 
