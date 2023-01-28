@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MovieDataBase_Api.Db.Entities;
+using MovieDataBase_Api.Db.Mappings;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 
@@ -16,6 +17,7 @@ namespace MovieDataBase_Api.Db
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+          //  builder.ApplyConfiguration(new MovieMap());
             base.OnModelCreating(builder);
         }
 

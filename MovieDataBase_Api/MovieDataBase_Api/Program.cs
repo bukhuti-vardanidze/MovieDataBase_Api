@@ -2,7 +2,7 @@ using LinqToDB;
 using Microsoft.EntityFrameworkCore;
 using MovieDataBase_Api.Db;
 using MovieDataBase_Api.Db.Entities;
-
+using MovieDataBase_Api.Repositories;
 
 internal class Program
 {
@@ -13,7 +13,9 @@ internal class Program
         // Add services to the container.
 
         builder.Services.AddDbContext<AppDbContext>(options =>
-  options.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContextConnection")));
+        options.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContextConnection")));
+
+        builder.Services.AddTransient<IMovieRequestRepository, MovieRequestRepository>();
 
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
