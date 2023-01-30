@@ -15,15 +15,12 @@ namespace MovieDataBase_Api.Models.Request
         [StringLength(2000, MinimumLength = 10)]
         public string ShortDescription { get; set; }
 
-
         [Required]
         public DateTime ReleaseYear { get; set; }
 
         [Required]
         public string Director { get; set; }
-        [Required]
-        public MovieEntityStatus Status { get; set; }
-        [Required]
+        public MovieEntityStatus Status { get; set; }  
         public DateTime CreateYear { get; set; }
     }
 }

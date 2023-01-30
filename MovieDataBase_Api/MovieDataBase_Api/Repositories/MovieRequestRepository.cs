@@ -13,6 +13,7 @@ namespace MovieDataBase_Api.Repositories
         Task<MovieEntity> AddMovieAsync([FromBody] AddMovieRequest addMovie);
         Task<List<MovieEntity>> UpdateMovieAsync([FromBody] UpdateMovieRequest updateMovie);
         Task<MovieEntity> DeleteMoviesAsync([FromBody] DeleteMovieRequest deleteMovie);
+     //   Task<List<MovieEntity>> SearchMoviesAsync([FromBody] SearchMovieRequest searchMovie);
     }
 
 
@@ -69,27 +70,30 @@ namespace MovieDataBase_Api.Repositories
             return result;
         }
 
-        public async Task<MovieEntity> AddMovieAsync([FromBody] AddMovieRequest addMovie)
+        public async Task<MovieEntity> AddMovieAsync([FromBody]AddMovieRequest addMovie)
         {
-            // need return type
+           
 
 
-            //var newMovie = new MovieEntity()
-            //{
-            //    Id = addMovie.Id,
-            //    Name = addMovie.Name,
-            //    ShortDescription = addMovie.ShortDescription,
-            //    ReleaseYear = addMovie.ReleaseYear,
-            //    Director = addMovie.Director,
-            //    Status = addMovie.Status,
-            //    CreateYear = DateTime.UtcNow
-            //};
+            var newMovie = new MovieEntity()
+            {
+                Id = addMovie.Id,
+                Name = addMovie.Name,
+                ShortDescription = addMovie.ShortDescription,
+                ReleaseYear = addMovie.ReleaseYear,
+                Director = addMovie.Director,
+                Status = addMovie.Status,
+                CreateYear = DateTime.UtcNow
+            };
 
-            //var add =   await _db.MovieDb.AddAsync(newMovie);
-            //await _db.SaveChangesAsync();
+            var add = await _db.MovieDb.AddAsync(newMovie);
+            await _db.SaveChangesAsync();
+          
+            //
+            return add.Entity;
+            
 
 
-            return null;
 
 
             //another version
@@ -133,5 +137,14 @@ namespace MovieDataBase_Api.Repositories
             await _db.SaveChangesAsync();
             return result;
         }
+        //public async Task<List<MovieEntity>> SearchMoviesAsync([FromBody] SearchMovieRequest searchMovie)
+        //{
+
+        //    var result = await _db.MovieDb.Where(s => s.Name.Contains(searchMovie.Name) || 
+        //    s.ShortDescription.Contains(searchMovie.ShortDescription) ||
+        //    s.Director.Contains(searchMovie.Director)).ToListAsync();
+
+        //    return result;
+        //}
     }
 }

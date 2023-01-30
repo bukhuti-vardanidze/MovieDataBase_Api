@@ -66,10 +66,7 @@ namespace MovieDataBase_Api.Controllers
         public async Task<ActionResult<List<MovieEntity>>> DeleteMovie([FromBody] DeleteMovieRequest deleteMovie)
         {
             var result = await _movieRequestRepository.DeleteMoviesAsync(deleteMovie);
-            if(result.Status == MovieEntityStatus.Active)
-            {
-                result.Status = MovieEntityStatus.Deleted;
-            }
+            
             if (result is null)
             {
                 return NotFound("movie not found");
@@ -77,6 +74,14 @@ namespace MovieDataBase_Api.Controllers
 
             return Ok(result);
         }
+
+        //[HttpPost]
+        //public async Task<List<MovieEntity>> SearchMovie([FromBody] SearchMovieRequest searchMovie)
+        //{
+        //    var result = await _movieRequestRepository.SearchMoviesAsync(searchMovie);
+        //    return result;
+
+        //}
 
     }
 
