@@ -6,16 +6,13 @@ using MovieDataBase_Api.Models.Request;
 
 namespace MovieDataBase_Api.Repositories
 {
-
     public interface IMovieRequestRepository
     {
-       
         Task<List<MovieEntity>> GetAllMovieAsync();
         Task<MovieEntity?> GetSingleMovie(int id);
         Task<MovieEntity> AddMovieAsync([FromBody] AddMovieRequest addMovie);
         Task<List<MovieEntity>> UpdateMovieAsync([FromBody] UpdateMovieRequest updateMovie);
-
-
+        Task<MovieEntity> DeleteMoviesAsync([FromBody] DeleteMovieRequest deleteMovie);
     }
 
 
@@ -41,13 +38,11 @@ namespace MovieDataBase_Api.Repositories
                       ShortDescription = "blue people...2",
                       ReleaseYear = DateTime.Now,
                       Director=" James Cameron",
-                      Status = MovieEntityStatus.Active,
+                      Status = MovieEntityStatus.Deleted,
                       CreateYear = DateTime.Now
 
                   }
          };
-
-
 
         private readonly AppDbContext _db;
 
@@ -59,10 +54,8 @@ namespace MovieDataBase_Api.Repositories
 
         public async Task<List<MovieEntity>> GetAllMovieAsync()
         {
-            var getMovie = await _db.MovieDb.Where(g => g.Status == MovieEntityStatus.Active).ToListAsync();
+            var getMovie = await _db.MovieDb.ToListAsync();
             return getMovie;
-
-
         }
 
 
@@ -78,26 +71,38 @@ namespace MovieDataBase_Api.Repositories
 
         public async Task<MovieEntity> AddMovieAsync([FromBody] AddMovieRequest addMovie)
         {
-            var newMovie = new MovieEntity()
-            {
-                Id = addMovie.Id,
-                Name = addMovie.Name,
-                ShortDescription = addMovie.ShortDescription,
-                ReleaseYear = addMovie.ReleaseYear,
-                Director = addMovie.Director,
-                Status = addMovie.Status,
-                CreateYear = DateTime.UtcNow
-            };
+            // need return type
 
-            var add =   await _db.MovieDb.AddAsync(newMovie);
-            await _db.SaveChangesAsync();
-            return add.Entity;
+
+            //var newMovie = new MovieEntity()
+            //{
+            //    Id = addMovie.Id,
+            //    Name = addMovie.Name,
+            //    ShortDescription = addMovie.ShortDescription,
+            //    ReleaseYear = addMovie.ReleaseYear,
+            //    Director = addMovie.Director,
+            //    Status = addMovie.Status,
+            //    CreateYear = DateTime.UtcNow
+            //};
+
+            //var add =   await _db.MovieDb.AddAsync(newMovie);
+            //await _db.SaveChangesAsync();
+
+
+            return null;
+
+
+            //another version
+
+            //_db.MovieDb.Add(addMovie);
+            //await _db.SaveChangesAsync();
+            //return moviesEntity;
         }
 
         public async Task<List<MovieEntity>> UpdateMovieAsync([FromBody] UpdateMovieRequest updateMovie)
         {
             var findMovieforUpdate = await _db.MovieDb.FindAsync(updateMovie.Id);
-            if(findMovieforUpdate is null)
+            if (findMovieforUpdate is null)
             {
                 return null;
             }
@@ -106,32 +111,27 @@ namespace MovieDataBase_Api.Repositories
             findMovieforUpdate.ReleaseYear = updateMovie.ReleaseYear;
             findMovieforUpdate.Director = updateMovie.Director;
             findMovieforUpdate.Status = updateMovie.Status;
-            findMovieforUpdate.CreateYear  = DateTime.UtcNow;
+            findMovieforUpdate.CreateYear = DateTime.UtcNow;
 
+            _db.MovieDb.Update(findMovieforUpdate);
             await _db.SaveChangesAsync();
             return moviesEntity;
-        
+
         }
 
-        public async Task<List<MovieEntity>> DeleteMovie(int id)
+
+        public async Task<MovieEntity> DeleteMoviesAsync([FromBody]DeleteMovieRequest deleteMovie)
         {
-            //var statusChange = _db.MovieDb.Where(x => x.Status.Active);
-            //var result = await _db.MovieDb.FindAsync(statusChange);
+            var result = await _db.MovieDb.FindAsync(deleteMovie.Id);
 
-            var statusChange = _db.MovieDb.Where(x => x.Id == id && x.Status != 0);
+            if (result.Status == MovieEntityStatus.Active)
+            {
+                result.Status = MovieEntityStatus.Deleted;
+            }
 
-
-
-            
-            //if (hero is null)
-            //{
-            //    return null;
-            //}
-
-            //_db.Moviedb.Remove(hero);
-            //await _db.SaveChangesAsync();
-            //return superHeroes;
+            _db.MovieDb.Update(result);
+            await _db.SaveChangesAsync();
+            return result;
         }
-
     }
 }

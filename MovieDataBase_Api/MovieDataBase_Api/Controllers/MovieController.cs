@@ -20,12 +20,12 @@ namespace MovieDataBase_Api.Controllers
         [HttpGet]
         public async Task<ActionResult<List<MovieEntity>>> GetAllMovies()
         {
-            var result = await _movieRequestRepository.GetAllMovieAsync();
-            return Ok(result);
+            return await _movieRequestRepository.GetAllMovieAsync();
+            
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<List<MovieEntity>>> GetAllMovies(int id)
+        public async Task<ActionResult<MovieEntity>> GetAllMovies(int id)
         {
             var result = await _movieRequestRepository.GetSingleMovie(id);
             if (result is null)
@@ -38,7 +38,7 @@ namespace MovieDataBase_Api.Controllers
         [HttpPost]
         public async Task<MovieEntity> AddMovie([FromBody] AddMovieRequest addMovie)
         {
-           var result =await _movieRequestRepository.AddMovieAsync(addMovie);
+            var result = await _movieRequestRepository.AddMovieAsync(addMovie);
 
             //if (result is null)
             //{
@@ -47,8 +47,6 @@ namespace MovieDataBase_Api.Controllers
             //return Ok(result);
 
             return result;
-           
-
         }
 
         [HttpPut("{id}")]
@@ -63,8 +61,23 @@ namespace MovieDataBase_Api.Controllers
             return Ok(result);
         }
 
-        [HttpDelete]
 
+        [HttpDelete]
+        public async Task<ActionResult<List<MovieEntity>>> DeleteMovie([FromBody] DeleteMovieRequest deleteMovie)
+        {
+            var result = await _movieRequestRepository.DeleteMoviesAsync(deleteMovie);
+            if(result.Status == MovieEntityStatus.Active)
+            {
+                result.Status = MovieEntityStatus.Deleted;
+            }
+            if (result is null)
+            {
+                return NotFound("movie not found");
+            }
+
+            return Ok(result);
+        }
 
     }
+
  }

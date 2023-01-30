@@ -17,7 +17,7 @@ internal class Program
 
        builder.Services.AddTransient<IMovieRequestRepository, MovieRequestRepository>();
 
-        // builder.Services.AddControllers();
+         builder.Services.AddControllers();
 
         builder.Services.AddControllersWithViews();
 
