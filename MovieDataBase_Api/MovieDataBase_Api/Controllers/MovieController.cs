@@ -51,6 +51,19 @@ namespace MovieDataBase_Api.Controllers
 
         }
 
+        [HttpPut("{id}")]
+        public async Task<ActionResult<List<MovieEntity>>> UpdateHero([FromBody] UpdateMovieRequest updateMovies)
+        {
+            var result = await _movieRequestRepository.UpdateMovieAsync(updateMovies);
+            if (result is null)
+            {
+                return NotFound("movie not found");
+            }
+
+            return Ok(result);
+        }
+
+        [HttpDelete]
 
 
     }
