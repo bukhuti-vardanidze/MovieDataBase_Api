@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 using MovieDataBase_Api.Db.Entities;
 using MovieDataBase_Api.Models.Request;
-
 using MovieDataBase_Api.Repositories;
 
 namespace MovieDataBase_Api.Controllers
@@ -17,20 +17,41 @@ namespace MovieDataBase_Api.Controllers
             _movieRequestRepository = movieRequestRepository;
         }
 
-        //[HttpPost("Add-Movie")]
-        //public async Task<IActionResult> AddMovie([FromBody] MovieRequestRepository request)
-        //{
-        //    var entity = new MovieEntity();
-        //    return Ok(entity);
+        [HttpGet]
+        public async Task<ActionResult<List<MovieEntity>>> GetAllMovies()
+        {
+            var result = await _movieRequestRepository.GetAllMovieAsync();
+            return Ok(result);
+        }
 
-        //}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<List<MovieEntity>>> GetAllMovies(int id)
+        {
+            var result = await _movieRequestRepository.GetSingleMovie(id);
+            if (result is null)
+            {
+                return NotFound("movie not found");
+            }
+            return Ok(result);
+        }
 
-        //[HttpGet("")]
-        //public async Task<IActionResult> GetAllMovie()
-        //{
-        //    var movie = await _movieRequestRepository.GetAllMovieAsync();
-        //    return Ok(movie);
+        [HttpPost]
+        public async Task<MovieEntity> AddMovie([FromBody] AddMovieRequest addMovie)
+        {
+           var result =await _movieRequestRepository.AddMovieAsync(addMovie);
 
-        //}
+            //if (result is null)
+            //{
+            //    return NotFound("movie not found");
+            //}
+            //return Ok(result);
+
+            return result;
+           
+
+        }
+
+
+
     }
-}
+ }

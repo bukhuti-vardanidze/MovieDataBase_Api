@@ -1,4 +1,5 @@
 ﻿using LinqToDB;
+using Microsoft.AspNetCore.Mvc;
 using MovieDataBase_Api.Db;
 using MovieDataBase_Api.Db.Entities;
 using MovieDataBase_Api.Models.Request;
@@ -8,13 +9,43 @@ namespace MovieDataBase_Api.Repositories
 
     public interface IMovieRequestRepository
     {
-        Task AddMovieAsync(int id, string name, string shortDescription, DateTime year, string director, string status, DateTime createYear);
-        Task<List<AddMovieRequest>> GetAllMovieAsync();
+       
+        Task<List<MovieEntity>> GetAllMovieAsync();
+        Task<MovieEntity?> GetSingleMovie(int id);
+        Task<MovieEntity> AddMovieAsync([FromBody] AddMovieRequest addMovie);
     }
 
 
     public class MovieRequestRepository : IMovieRequestRepository
     {
+        //private static List<MovieEntity> moviesEntity = new List<MovieEntity>
+        //{
+        //          new MovieEntity
+        //          {
+        //              Id= 1,
+        //              Name = "AVATAR-1",
+        //              ShortDescription = "blue people...",
+        //              ReleaseYear = DateTime.Now,
+        //              Director=" James Cameron",
+        //              Status = MovieEntityStatus.Active,
+        //              CreateYear = DateTime.Now
+
+        //          },
+        //           new MovieEntity
+        //          {
+        //              Id= 2,
+        //              Name = "AVATAR-2",
+        //              ShortDescription = "blue people...2",
+        //              ReleaseYear = DateTime.Now,
+        //              Director=" James Cameron",
+        //              Status = MovieEntityStatus.Active,
+        //              CreateYear = DateTime.Now
+
+        //          }
+        // };
+
+
+
         private readonly AppDbContext _db;
 
         public MovieRequestRepository(AppDbContext db)
@@ -23,34 +54,41 @@ namespace MovieDataBase_Api.Repositories
         }
 
 
-        //public async Task<List<AddMovieRequest>> GetAllMovieAsync()
-        //{
-        //    var records =await _db.MovieDb.Select(x => new AddMovieRequest()
-        //    {
-        //        Id = x.Id,
-        //        Name = x.Name,
-        //        ShortDescription = x.ShortDescription,
-        //        Year = x.Year,
-        //        Director = x.Director
-        //    }).ToListAsync();
-
-        //    return records;
-        //}
-
-
-        public async Task AddMovieAsync(int id, string name, string shortDescription, DateTime year, string director, string status, DateTime createYear)
+        public async Task<List<MovieEntity>> GetAllMovieAsync()
         {
-            var entity = new MovieEntity();
-            entity.Id = id;
-            entity.Name = name;
-            entity.ShortDescription = shortDescription;
-            entity.Year = year;
-            entity.Director = director;
-            entity.Status = MovieEntityStatus.Active;
-            entity.CreateYear = createYear;
+            var getMovie = await _db.MovieDb.Where(g => g.Status == MovieEntityStatus.Active).ToListAsync();
+            return getMovie;
 
-            await _db.MovieDb.AddAsync(entity);
-            
+        }
+
+
+        public async Task<MovieEntity?> GetSingleMovie(int id)
+        {
+            var result = await _db.MovieDb.FindAsync(id);
+            if (result is null)
+            {
+                return null;
+            }
+            return result;
+        }
+
+        public async Task<MovieEntity> AddMovieAsync([FromBody] AddMovieRequest addMovie)
+        {
+            var newMovie = new MovieEntity()
+            {
+                Id = addMovie.Id,
+                Name = addMovie.Name,
+                ShortDescription = addMovie.ShortDescription,
+                ReleaseYear = addMovie.ReleaseYear,
+                Director = addMovie.Director,
+                Status = addMovie.Status,
+                CreateYear = DateTime.UtcNow
+            };
+
+            var add =   await _db.MovieDb.AddAsync(newMovie);
+            await _db.SaveChangesAsync();
+            return add.Entity;
+
 
         }
     }

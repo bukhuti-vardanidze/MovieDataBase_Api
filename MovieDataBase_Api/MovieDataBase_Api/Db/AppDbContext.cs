@@ -17,7 +17,7 @@ namespace MovieDataBase_Api.Db
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-          //  builder.ApplyConfiguration(new MovieMap());
+          
             base.OnModelCreating(builder);
         }
 
