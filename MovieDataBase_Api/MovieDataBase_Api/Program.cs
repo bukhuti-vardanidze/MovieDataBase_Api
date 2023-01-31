@@ -12,14 +12,13 @@ internal class Program
 
         // Add services to the container.
 
+        var connection = builder.Configuration["AppDbContextConnection"];
         builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContextConnection")));
+        options.UseSqlServer(connection));
 
        builder.Services.AddTransient<IMovieRequestRepository, MovieRequestRepository>();
 
          builder.Services.AddControllers();
-
-        builder.Services.AddControllersWithViews();
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
