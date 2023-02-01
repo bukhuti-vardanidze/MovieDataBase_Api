@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MovieDataBase_Api.Db;
 using MovieDataBase_Api.Db.Entities;
 using MovieDataBase_Api.Models.Request;
+using System.IO;
 
 namespace MovieDataBase_Api.Repositories
 {
@@ -10,40 +11,17 @@ namespace MovieDataBase_Api.Repositories
     {
         Task<List<MovieEntity>> GetAllMovieAsync();
         Task<MovieEntity?> GetSingleMovie(int id);
-        Task<MovieEntity> AddMovieAsync([FromBody] AddMovieRequest addMovie);
-        Task<List<MovieEntity>> UpdateMovieAsync([FromBody] UpdateMovieRequest updateMovie);
+        Task<int> AddMovieAsync([FromBody] AddMovieRequest addMovie);
+        Task<MovieEntity> UpdateMovieAsync([FromBody] UpdateMovieRequest updateMovie,int id);
         Task<MovieEntity> DeleteMoviesAsync([FromBody] DeleteMovieRequest deleteMovie);
-     //   Task<List<MovieEntity>> SearchMoviesAsync([FromBody] SearchMovieRequest searchMovie);
+        Task<List<MovieEntity>> SearchMovieAsync([FromBody] SearchMovieRequest search);
+        //   Task<List<MovieEntity>> SearchMoviesAsync([FromBody] SearchMovieRequest searchMovie);
     }
 
 
     public class MovieRequestRepository : IMovieRequestRepository
     {
-        private static List<MovieEntity> moviesEntity = new List<MovieEntity>
-        {
-                  new MovieEntity
-                  {
-                      Id= 1,
-                      Name = "AVATAR-1",
-                      ShortDescription = "blue people...",
-                      ReleaseYear = DateTime.Now,
-                      Director=" James Cameron",
-                      Status = MovieEntityStatus.Active,
-                      CreateYear = DateTime.Now
-
-                  },
-                   new MovieEntity
-                  {
-                      Id= 2,
-                      Name = "AVATAR-2",
-                      ShortDescription = "blue people...2",
-                      ReleaseYear = DateTime.Now,
-                      Director=" James Cameron",
-                      Status = MovieEntityStatus.Deleted,
-                      CreateYear = DateTime.Now
-
-                  }
-         };
+        
 
         private readonly AppDbContext _db;
 
@@ -70,11 +48,10 @@ namespace MovieDataBase_Api.Repositories
             return result;
         }
 
-        public async Task<MovieEntity> AddMovieAsync([FromBody]AddMovieRequest addMovie)
+      
+
+        public async Task<int> AddMovieAsync([FromBody] AddMovieRequest addMovie)
         {
-           
-
-
             var newMovie = new MovieEntity()
             {
                 Id = addMovie.Id,
@@ -86,57 +63,88 @@ namespace MovieDataBase_Api.Repositories
                 CreateYear = DateTime.UtcNow
             };
 
-            var add = await _db.MovieDb.AddAsync(newMovie);
+            _db.MovieDb.Add(newMovie);
             await _db.SaveChangesAsync();
-          
+
             //
-            return add.Entity;
-            
+            return newMovie.Id;
 
 
-
-
-            //another version
-
-            //_db.MovieDb.Add(addMovie);
-            //await _db.SaveChangesAsync();
-            //return moviesEntity;
         }
 
-        public async Task<List<MovieEntity>> UpdateMovieAsync([FromBody] UpdateMovieRequest updateMovie)
+        public async Task<MovieEntity> UpdateMovieAsync([FromBody] UpdateMovieRequest updateMovie, int id)
         {
-            var findMovieforUpdate = await _db.MovieDb.FindAsync(updateMovie.Id);
-            if (findMovieforUpdate is null)
+          var result = await _db.MovieDb.FindAsync(id);
+
+           if(result is  null)
             {
                 return null;
             }
-            findMovieforUpdate.Name = updateMovie.Name;
-            findMovieforUpdate.ShortDescription = updateMovie.ShortDescription;
-            findMovieforUpdate.ReleaseYear = updateMovie.ReleaseYear;
-            findMovieforUpdate.Director = updateMovie.Director;
-            findMovieforUpdate.Status = updateMovie.Status;
-            findMovieforUpdate.CreateYear = DateTime.UtcNow;
 
-            _db.MovieDb.Update(findMovieforUpdate);
+            result.Id = id;
+            result.Name = updateMovie.Name;
+            result.ShortDescription = updateMovie.ShortDescription;
+            result.ReleaseYear = updateMovie.ReleaseYear;
+            result.Director = updateMovie.Director;
+            result.Status = updateMovie.Status;
+            result.CreateYear = DateTime.UtcNow;
+
+            //var findMovieforUpdate = new MovieEntity()
+            //{
+            //    Id = updateMovie.Id,
+            //    Name = updateMovie.Name,
+            //    ShortDescription = updateMovie.ShortDescription,
+            //    ReleaseYear = updateMovie.ReleaseYear,
+            //    Director = updateMovie.Director,
+            //    Status = updateMovie.Status,
+            //    CreateYear = DateTime.UtcNow
+
+            //};
+
+
+            _db.MovieDb.Update(result);
             await _db.SaveChangesAsync();
-            return moviesEntity;
+            return result;
+
 
         }
 
 
-        public async Task<MovieEntity> DeleteMoviesAsync([FromBody]DeleteMovieRequest deleteMovie)
+        public async Task<MovieEntity> DeleteMoviesAsync([FromBody] DeleteMovieRequest deleteMovie)
         {
             var result = await _db.MovieDb.FindAsync(deleteMovie.Id);
 
             if (result.Status == MovieEntityStatus.Active)
             {
                 result.Status = MovieEntityStatus.Deleted;
+            } else
+            {
+                result.Status = MovieEntityStatus.Active;
             }
 
             _db.MovieDb.Update(result);
             await _db.SaveChangesAsync();
             return result;
         }
+
+
+
+
+        public async  Task<List<MovieEntity>> SearchMovieAsync([FromBody] SearchMovieRequest search)
+        {
+            //.Where(t => t.Id == id)
+            var serachResult = _db.MovieDb 
+                .Where(t => t.Name.Contains(search.Name))
+                .OrderBy(t => t.CreateYear)
+                .ToList();
+            
+            return serachResult;
+        }
+
+
+
+
+
         //public async Task<List<MovieEntity>> SearchMoviesAsync([FromBody] SearchMovieRequest searchMovie)
         //{
 

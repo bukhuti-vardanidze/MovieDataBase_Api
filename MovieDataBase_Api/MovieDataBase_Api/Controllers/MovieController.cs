@@ -17,15 +17,20 @@ namespace MovieDataBase_Api.Controllers
             _movieRequestRepository = movieRequestRepository;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<MovieEntity>>> GetAllMovies()
+        [HttpGet("getAllmovie")]
+        public async Task<IActionResult> GetAllMovies()
         {
-            return await _movieRequestRepository.GetAllMovieAsync();
-            
+           var result =  await _movieRequestRepository.GetAllMovieAsync();
+            if(result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<MovieEntity>> GetAllMovies(int id)
+        [HttpGet("getSinglemovie")]
+        public async Task<IActionResult> GetAllMovies(int id)
         {
             var result = await _movieRequestRepository.GetSingleMovie(id);
             if (result is null)
@@ -35,38 +40,32 @@ namespace MovieDataBase_Api.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
-        public async Task<MovieEntity> AddMovie([FromBody] AddMovieRequest addMovie)
+
+
+        [HttpPost("addMovie")]
+        public async Task<IActionResult> AddMovie([FromBody] AddMovieRequest addMovie)
         {
             var result = await _movieRequestRepository.AddMovieAsync(addMovie);
 
-            //if (result is null)
-            //{
-            //    return NotFound("movie not found");
-            //}
-            //return Ok(result);
+            
+            return Ok(result);
 
-            return result;
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<List<MovieEntity>>> UpdateHero([FromBody]UpdateMovieRequest updateMovies)
+        [HttpPost("Update")]
+        public async Task<IActionResult> UpdateMovie([FromBody] UpdateMovieRequest updateMovies,int id)
         {
-            var result = await _movieRequestRepository.UpdateMovieAsync(updateMovies);
-            if (result is null)
-            {
-                return NotFound("movie not found");
-            }
+            var result = _movieRequestRepository.UpdateMovieAsync(updateMovies,id);
 
             return Ok(result);
         }
 
 
         [HttpDelete]
-        public async Task<ActionResult<List<MovieEntity>>> DeleteMovie([FromBody] DeleteMovieRequest deleteMovie)
+        public async Task<IActionResult> DeleteMovie([FromBody] DeleteMovieRequest deleteMovie)
         {
             var result = await _movieRequestRepository.DeleteMoviesAsync(deleteMovie);
-            
+
             if (result is null)
             {
                 return NotFound("movie not found");
@@ -75,7 +74,18 @@ namespace MovieDataBase_Api.Controllers
             return Ok(result);
         }
 
-        //[HttpPost]
+        [HttpGet("searchBy")]
+
+        public async Task<IActionResult> SearchMovieByName([FromBody] SearchMovieRequest request)
+        {
+            var result = await _movieRequestRepository.SearchMovieAsync(request);
+            return Ok(result);
+        }
+
+
+        
+
+
         //public async Task<List<MovieEntity>> SearchMovie([FromBody] SearchMovieRequest searchMovie)
         //{
         //    var result = await _movieRequestRepository.SearchMoviesAsync(searchMovie);
@@ -85,4 +95,4 @@ namespace MovieDataBase_Api.Controllers
 
     }
 
- }
+}

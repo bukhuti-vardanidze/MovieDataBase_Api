@@ -17,7 +17,7 @@ namespace MovieDataBase_Api.Models.Request
 
 
         [Required]
-        public DateTime ReleaseYear { get; set; }
+        public int ReleaseYear { get; set; }
 
         [Required]
         public string Director { get; set; }

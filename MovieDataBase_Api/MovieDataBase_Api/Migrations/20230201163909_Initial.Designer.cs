@@ -12,7 +12,7 @@ using MovieDataBase_Api.Db;
 namespace MovieDataBaseApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230130171042_Initial")]
+    [Migration("20230201163909_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -45,8 +45,8 @@ namespace MovieDataBaseApi.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<DateTime>("ReleaseYear")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("ReleaseYear")
+                        .HasColumnType("int");
 
                     b.Property<string>("ShortDescription")
                         .IsRequired()
