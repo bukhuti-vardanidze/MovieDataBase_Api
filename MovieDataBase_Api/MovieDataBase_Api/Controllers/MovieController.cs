@@ -60,6 +60,17 @@ namespace MovieDataBase_Api.Controllers
             return Ok(result);
         }
 
+        [HttpPost("Update-V2")]
+        public async Task<IActionResult> UpdateMovieV2( int id, MovieEntity entity)
+        {
+            var result = _movieRequestRepository.UpdateMovie(id, entity);
+
+            return Ok(result);
+        }
+
+
+
+
 
         [HttpDelete]
         public async Task<IActionResult> DeleteMovie([FromBody] DeleteMovieRequest deleteMovie)

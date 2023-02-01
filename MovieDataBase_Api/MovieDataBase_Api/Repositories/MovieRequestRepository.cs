@@ -13,6 +13,7 @@ namespace MovieDataBase_Api.Repositories
         Task<MovieEntity?> GetSingleMovie(int id);
         Task<int> AddMovieAsync([FromBody] AddMovieRequest addMovie);
         Task<MovieEntity> UpdateMovieAsync([FromBody] UpdateMovieRequest updateMovie,int id);
+        Task UpdateMovie(int id, MovieEntity updateMovie);
         Task<MovieEntity> DeleteMoviesAsync([FromBody] DeleteMovieRequest deleteMovie);
         Task<List<MovieEntity>> SearchMovieAsync([FromBody] SearchMovieRequest search);
         //   Task<List<MovieEntity>> SearchMoviesAsync([FromBody] SearchMovieRequest searchMovie);
@@ -86,8 +87,7 @@ namespace MovieDataBase_Api.Repositories
             result.ShortDescription = updateMovie.ShortDescription;
             result.ReleaseYear = updateMovie.ReleaseYear;
             result.Director = updateMovie.Director;
-            result.Status = updateMovie.Status;
-            result.CreateYear = DateTime.UtcNow;
+            
 
             //var findMovieforUpdate = new MovieEntity()
             //{
@@ -108,6 +108,28 @@ namespace MovieDataBase_Api.Repositories
 
 
         }
+
+
+        public async Task UpdateMovie(int id,MovieEntity updateMovie)
+        {
+            var result = await _db.MovieDb.FindAsync(id);
+
+            if (result is null)
+            {
+                return;
+            }
+            
+            result.Name = updateMovie.Name;
+            result.ShortDescription = updateMovie.ShortDescription;
+            result.ReleaseYear = updateMovie.ReleaseYear;
+            result.Director = updateMovie.Director;
+
+            _db.MovieDb.Update(result);
+            await _db.SaveChangesAsync();
+            
+
+        }
+
 
 
         public async Task<MovieEntity> DeleteMoviesAsync([FromBody] DeleteMovieRequest deleteMovie)
